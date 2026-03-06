@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Sorteos VIP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --bg: #05050D;
+  --surface: #0A0A18;
+  --card: #0D0D1F;
+  --card2: #111125;
+  --gold: #C9A84C;
+  --gold2: #F0D060;
+  --gold3: #E8C060;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.25);
+  --gold-border2: rgba(201,168,76,0.5);
+  --text: #F0EAD6;
+  --text2: #B8B0A0;
+  --muted: #5A5570;
+  --green: #00D46A;
+  --red: #FF3B5C;
+  --blue: #4A9EFF;
+  --orange: #FF8C00;
+  --shadow-gold: 0 0 40px rgba(201,168,76,0.15);
+  --shadow-deep: 0 20px 60px rgba(0,0,0,0.7);
+  --r: 16px;
+  --r2: 24px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Raleway', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ─── PARTICLES CANVAS ─── */
+#particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* ─── BG GRADIENTS ─── */
+.bg-glow {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(201,168,76,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(201,168,76,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 60%);
+}
+
+/* ─── NOISE TEXTURE ─── */
+.bg-noise {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0 18px;
+  border-bottom: 1px solid var(--gold-border);
+  margin-bottom: 36px;
+  position: sticky; top: 0; z-index: 90;
+  background: rgba(5,5,13,0.92);
+  backdrop-filter: blur(20px);
+  margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px;
+}
+.logo {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 900; letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 50%, var(--gold) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmerText 3s linear infinite;
+  text-decoration: none;
+}
+@keyframes shimmerText {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--gold-border);
+  background: var(--gold-dim);
+  color: var(--gold); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer; transition: all .2s;
+  position: relative;
+}
+.nav-icon:hover { border-color: var(--gold-border2); background: rgba(201,168,76,0.25); transform: scale(1.08); }
+.nav-icon .notif-dot {
+  position: absolute; top: 2px; right: 2px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); border: 1.5px solid var(--bg);
+  display: none;
+}
+.nav-icon .notif-dot.show { display: block; animation: pulse 1.5s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+
+/* ─── SUPPORT BUTTON ─── */
+#supportBtn {
+  position: fixed; bottom: 24px; right: 24px; z-index: 80;
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #128C7E, #25D366);
+  color: #fff; font-family: 'Raleway', sans-serif;
+  font-size: 13px; font-weight: 700;
+  padding: 12px 18px; border-radius: 100px; border: none;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+  transition: all .2s; text-decoration: none;
+}
+#supportBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,0.5); }
+
+/* ═══════════════════════════════════════════
+   HERO / PRIZE SECTION
+═══════════════════════════════════════════ */
+.prize-hero {
+  border-radius: var(--r2); overflow: hidden;
+  border: 1px solid var(--gold-border);
+  background: var(--card);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-deep), var(--shadow-gold);
+  animation: fadeUp .6s ease both;
+}
+.prize-img {
+  width: 100%; aspect-ratio: 16/8;
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #080820, #15103A);
+  display: flex; align-items: center; justify-content: center;
+}
+.prize-img img { width:100%; height:100%; object-fit:cover; display:none; }
+.prize-img-ph {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font-size: 72px;
+}
+.prize-img-ph p { font-size: 12px; color: var(--muted); font-family: 'Raleway', sans-serif; }
+.prize-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(5,5,13,0.95) 0%, rgba(5,5,13,0.2) 50%, transparent 100%);
+}
+.prize-corner-deco {
+  position: absolute; top: 12px; right: 12px;
+  width: 60px; height: 60px; opacity: .15;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 2 L35 22 L55 22 L40 34 L46 54 L30 42 L14 54 L20 34 L5 22 L25 22 Z' fill='%23C9A84C'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.prize-status {
+  position: absolute; top: 14px; left: 14px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.badge {
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  font-family: 'Raleway', sans-serif;
+}
+.badge-live { background: var(--green); color: #000; }
+.badge-closed { background: var(--red); color: #fff; }
+.badge-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000;
+}
+.live-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #000; margin-right: 4px;
+  animation: pulse 1.5s ease infinite;
+}
+.prize-body { padding: 24px; }
+.prize-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(20px, 5vw, 32px);
+  font-weight: 900; line-height: 1.1;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #fff 40%, var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.prize-desc { font-size: 14px; color: var(--text2); line-height: 1.8; margin-bottom: 20px; font-weight: 400; }
+
+/* ─── COUNTDOWN ─── */
+.countdown-wrap {
+  background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(201,168,76,0.03));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r); padding: 16px 20px;
+  margin-bottom: 20px; text-align: center;
+}
+.countdown-label {
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--gold); font-weight: 700; margin-bottom: 12px;
+}
+.countdown-timer { display: flex; justify-content: center; gap: 16px; }
+.cd-unit { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 52px; }
+.cd-num {
+  font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700;
+  color: var(--gold2); line-height: 1;
+  background: var(--card2); border: 1px solid var(--gold-border);
+  border-radius: 10px; padding: 8px 12px; width: 100%; text-align: center;
+}
+.cd-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+.cd-sep { font-family: 'Cinzel', serif; font-size: 24px; color: var(--gold); align-self: center; margin-bottom: 14px; }
+
+/* ─── LOTTERY INFO ─── */
+.lottery-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(74,158,255,0.06); border: 1px solid rgba(74,158,255,0.15);
+  border-radius: 12px; padding: 10px 16px; margin-bottom: 20px; font-size: 13px;
+}
+.lottery-row strong { color: #4A9EFF; font-weight: 600; }
+.lottery-row span { color: var(--text2); }
+
+/* ─── PROGRESS ─── */
+.prog-wrap { margin-bottom: 8px; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.prog-head .p-label { font-size: 12px; color: var(--text2); }
+.prog-head .p-pct {
+  font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
+  color: var(--gold2);
+}
+.prog-bg {
+  height: 14px; background: rgba(255,255,255,0.06);
+  border-radius: 100px; overflow: hidden; position: relative;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.prog-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold2) 60%, #fff8 100%);
+  transition: width 1.6s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.prog-fill::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35));
+  border-radius: 100px; animation: progShine 2s ease infinite;
+}
+@keyframes progShine {
+  0%,100% { opacity: 0; } 50% { opacity: 1; }
+}
+.prog-sub {
+  display: flex; justify-content: space-between;
+  margin-top: 8px; font-size: 11px; color: var(--muted);
+}
+.urgency-bar {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(255,60,0,0.1); border: 1px solid rgba(255,60,0,0.25);
+  border-radius: 10px; padding: 8px 14px; margin-top: 10px;
+  font-size: 12px; color: #FF6B35; font-weight: 600;
+  animation: urgencyPulse 2s ease infinite;
+}
+.urgency-bar.show { display: flex; }
+@keyframes urgencyPulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+
+/* ═══════════════════════════════════════════
+   SPECIAL NUMBERS
+═══════════════════════════════════════════ */
+.section-head {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold); white-space: nowrap;
+}
+.section-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-border), transparent); }
+
+.specials-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.sp-chip {
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.05));
+  border: 1px solid var(--gold-border2);
+  border-radius: 12px; padding: 10px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: transform .2s;
+}
+.sp-chip:hover { transform: scale(1.05); }
+.sp-num {
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+  color: var(--gold2);
+}
+.sp-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════
+   PACKS / TICKETS
+═══════════════════════════════════════════ */
+.packs-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.pack {
+  background: var(--card2); border: 1.5px solid rgba(255,255,255,0.06);
+  border-radius: var(--r); padding: 18px 10px 14px;
+  text-align: center; cursor: pointer;
+  transition: all .2s; position: relative; overflow: hidden;
+}
+.pack::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.pack:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.pack:hover::before { opacity: 1; }
+.pack.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 8px 24px rgba(201,168,76,0.25);
+  transform: translateY(-3px);
+}
+.pack.selected::before { opacity: 1; }
+.pack.hot { border-color: rgba(201,168,76,0.35); }
+.pack-hot-tag {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000; font-size: 8px; font-weight: 800; letter-spacing: 1.5px;
+  padding: 2px 10px; border-radius: 0 0 8px 8px; text-transform: uppercase;
+}
+.pack-qty {
+  font-family: 'Cinzel', serif; font-size: 30px; font-weight: 700;
+  color: var(--text); line-height: 1;
+}
+.pack-lbl { font-size: 10px; color: var(--muted); margin: 4px 0 10px; font-weight: 500; }
+.pack-price { font-size: 13px; font-weight: 700; color: var(--gold); }
+.pack-unit { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+.custom-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--card2); border: 1.5px solid rgba(255,255,255,0.06);
+  border-radius: var(--r); padding: 14px 18px; margin-bottom: 24px;
+}
+.custom-row label { font-size: 13px; color: var(--text2); flex: 1; }
+.qty-ctrl { display: flex; align-items: center; gap: 12px; }
+.qty-b {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--gold-border);
+  background: var(--gold-dim); color: var(--gold); font-size: 20px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; font-family: 'Raleway', sans-serif; line-height: 1;
+  user-select: none;
+}
+.qty-b:hover { background: rgba(201,168,76,0.25); transform: scale(1.12); }
+.qty-val {
+  font-family: 'Cinzel', serif; font-size: 26px; font-weight: 700;
+  min-width: 44px; text-align: center; color: var(--gold2);
+}
+
+/* MIN NOTICE */
+.min-notice {
+  font-size: 11px; color: var(--orange);
+  text-align: center; margin: -18px 0 18px;
+  font-weight: 600; letter-spacing: .5px;
+  display: none;
+}
+.min-notice.show { display: block; }
+
+/* ═══════════════════════════════════════════
+   BUYER FORM
+═══════════════════════════════════════════ */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-deep);
+  animation: fadeUp .6s .1s ease both;
+}
+.form-card-title {
+  font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+  color: var(--gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.returning-banner {
+  display: none; background: rgba(0,212,106,0.08);
+  border: 1px solid rgba(0,212,106,0.2);
+  border-radius: 12px; padding: 10px 14px;
+  font-size: 13px; color: var(--green);
+  margin-bottom: 16px; font-weight: 500;
+}
+.returning-banner.show { display: block; }
+
+.fgrid { display: grid; gap: 14px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:480px) { .frow { grid-template-columns: 1fr; } }
+.field label {
+  display: block; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.field input, .field select {
+  width: 100%; background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 12px 16px;
+  font-family: 'Raleway', sans-serif; font-size: 14px;
+  color: var(--text); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+.field input::placeholder { color: var(--muted); }
+.field input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(255,59,92,0.1); }
+.field input.ok { border-color: var(--green); }
+.field select option { background: #0D0D1F; color: var(--text); }
+
+/* ANTIBOT */
+.antibot-wrap {
+  background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: all .2s; user-select: none; margin-top: 4px;
+}
+.antibot-wrap.done { border-color: var(--green); background: rgba(0,212,106,0.05); }
+.antibot-box {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+  font-size: 14px;
+}
+.antibot-wrap.done .antibot-box {
+  background: var(--green); border-color: var(--green);
+}
+.antibot-text { font-size: 13px; color: var(--text2); }
+.antibot-wrap.done .antibot-text { color: var(--green); font-weight: 600; }
+.antibot-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--gold);
+  animation: spin .8s linear infinite; display: none; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.antibot-wrap.loading .antibot-spinner { display: block; }
+.antibot-wrap.loading .antibot-box { display: none; }
+
+/* T&C */
+.tc-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: 14px; cursor: pointer;
+}
+.tc-check {
+  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; margin-top: 1px; font-size: 11px;
+}
+.tc-row.checked .tc-check { background: var(--gold); border-color: var(--gold); color: #000; }
+.tc-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.tc-text a { color: var(--gold); text-decoration: underline; cursor: pointer; }
+
+/* PAYMENT METHODS */
+.pay-section { margin-top: 22px; }
+.pay-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.pay-m {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: var(--r);
+  background: rgba(255,255,255,0.03);
+  border: 1.5px solid rgba(255,255,255,0.07);
+  cursor: pointer; transition: all .2s;
+}
+.pay-m:hover { background: rgba(255,255,255,0.06); }
+.pay-m.selected { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+.pay-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.pay-info { flex: 1; }
+.pay-name { font-size: 14px; font-weight: 600; }
+.pay-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pay-radio {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; transition: all .2s;
+}
+.pay-m.selected .pay-radio {
+  border-color: var(--gold); background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
+}
+
+/* ═══════════════════════════════════════════
+   SUMMARY & CTA
+═══════════════════════════════════════════ */
+.summary {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.04));
+  border: 1px solid var(--gold-border2);
+  border-radius: var(--r2); padding: 18px 22px;
+  margin-bottom: 14px;
+  animation: fadeUp .6s .15s ease both;
+}
+.sum-left .sum-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.sum-left .sum-total {
+  font-family: 'Cinzel', serif; font-size: 32px; font-weight: 700; color: var(--gold2);
+}
+.sum-right { text-align: right; }
+.sum-right .sum-qty { font-size: 14px; font-weight: 600; }
+.sum-right .sum-note { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.cta-btn {
+  width: 100%; padding: 20px;
+  border-radius: var(--r2); border: none;
+  background: linear-gradient(135deg, #8B6914 0%, var(--gold) 35%, var(--gold2) 65%, var(--gold) 100%);
+  background-size: 200% auto;
+  color: #000; font-family: 'Cinzel', serif;
+  font-size: clamp(16px,4vw,20px); font-weight: 700; letter-spacing: 2px;
+  cursor: pointer; transition: all .3s; position: relative; overflow: hidden;
+  box-shadow: 0 4px 30px rgba(201,168,76,0.35);
+  animation: fadeUp .6s .2s ease both;
+}
+.cta-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.cta-btn:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(201,168,76,0.5);
+}
+.cta-btn:hover::before { opacity: 1; }
+.cta-btn:active { transform: scale(.98); }
+.cta-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ═══════════════════════════════════════════
+   SEARCH SECTION
+═══════════════════════════════════════════ */
+.search-card {
+  background: var(--card); border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 24px;
+  margin: 32px 0 24px;
+  animation: fadeUp .6s .25s ease both;
+  box-shadow: var(--shadow-deep);
+}
+.search-row { display: flex; gap: 10px; margin-top: 14px; }
+.search-row input {
+  flex: 1; background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 12px 16px;
+  font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--text);
+  outline: none; transition: border-color .2s;
+}
+.search-row input:focus { border-color: var(--gold); }
+.search-row input::placeholder { color: var(--muted); }
+.search-btn {
+  padding: 0 20px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000; font-family: 'Raleway', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.search-btn:hover { transform: scale(1.03); }
+.search-result { margin-top: 16px; }
+.sr-found {
+  background: rgba(0,212,106,0.07); border: 1px solid rgba(0,212,106,0.2);
+  border-radius: var(--r); padding: 14px;
+}
+.sr-name { font-size: 13px; color: var(--green); font-weight: 700; margin-bottom: 10px; }
+.sr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sr-chip {
+  background: rgba(74,158,255,0.12); border: 1px solid rgba(74,158,255,0.3);
+  border-radius: 8px; padding: 6px 12px;
+  font-family: 'Cinzel', serif; font-size: 16px; color: #4A9EFF;
+}
+.sr-chip.pending {
+  background: rgba(255,140,0,0.1); border-color: rgba(255,140,0,0.3);
+  color: var(--orange);
+}
+.sr-none { font-size: 13px; color: var(--muted); text-align: center; padding: 10px 0; }
+
+/* ═══════════════════════════════════════════
+   NUMBER GRID
+═══════════════════════════════════════════ */
+.numgrid-card {
+  background: var(--card); border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 24px;
+  margin-bottom: 24px;
+  animation: fadeUp .6s .3s ease both;
+  box-shadow: var(--shadow-deep);
+}
+.numgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 4px; max-height: 400px; overflow-y: auto;
+  padding: 4px;
+}
+.ng {
+  aspect-ratio: 1; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600;
+  font-family: 'Raleway', sans-serif;
+  transition: all .15s; position: relative;
+}
+.ng.avail {
+  background: rgba(0,212,106,0.08); border: 1px solid rgba(0,212,106,0.18);
+  color: rgba(0,212,106,0.7); cursor: default;
+}
+.ng.avail:hover { background: rgba(0,212,106,0.15); }
+.ng.sold {
+  background: rgba(255,59,92,0.06); border: 1px solid rgba(255,59,92,0.12);
+  color: rgba(255,59,92,0.35); text-decoration: line-through;
+}
+.ng.pending {
+  background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.2);
+  color: rgba(255,140,0,0.6);
+}
+.ng.special {
+  background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.35);
+  color: var(--gold);
+}
+.ng.special.sold {
+  background: rgba(255,59,92,0.06); border: 1px solid rgba(255,59,92,0.12);
+  color: rgba(255,59,92,0.35);
+}
+.grid-legend {
+  display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap;
+}
+.leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+/* ═══════════════════════════════════════════
+   PAST WINNERS
+═══════════════════════════════════════════ */
+.winners-card {
+  background: var(--card); border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 24px;
+  margin-bottom: 24px;
+  animation: fadeUp .6s .35s ease both;
+  box-shadow: var(--shadow-deep);
+}
+.winner-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px; border-radius: var(--r);
+  background: rgba(201,168,76,0.05); border: 1px solid var(--gold-border);
+  margin-bottom: 10px; transition: all .2s;
+}
+.winner-item:hover { background: rgba(201,168,76,0.1); }
+.winner-item:last-child { margin-bottom: 0; }
+.winner-trophy { font-size: 28px; }
+.winner-info { flex: 1; }
+.winner-name { font-size: 14px; font-weight: 700; color: var(--gold2); }
+.winner-prize { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.winner-num {
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+  color: var(--gold); background: var(--gold-dim);
+  border: 1px solid var(--gold-border); border-radius: 8px;
+  padding: 6px 12px;
+}
+.no-winners { font-size: 13px; color: var(--muted); text-align: center; padding: 20px 0; }
+
+/* ═══════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════ */
+.faq-card {
+  background: var(--card); border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 24px; margin-bottom: 24px;
+  animation: fadeUp .6s .4s ease both;
+}
+.faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; cursor: pointer; font-size: 14px; font-weight: 600;
+  transition: color .2s;
+}
+.faq-q:hover { color: var(--gold); }
+.faq-arrow { font-size: 12px; color: var(--gold); transition: transform .3s; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a {
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+  max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .2s;
+}
+.faq-item.open .faq-a { max-height: 300px; padding-bottom: 14px; }
+
+/* ═══════════════════════════════════════════
+   T&C MODAL
+═══════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(16px);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: 16px; opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--card); border: 1px solid var(--gold-border2);
+  border-radius: var(--r2); padding: 30px 26px;
+  width: 100%; max-width: 460px;
+  transform: scale(.9) translateY(24px);
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  max-height: 88vh; overflow-y: auto;
+}
+.overlay.show .modal { transform: scale(1) translateY(0); }
+.modal-icon { font-size: 56px; text-align: center; margin-bottom: 14px; }
+.modal-title {
+  font-family: 'Cinzel', serif; font-size: 24px; font-weight: 900;
+  text-align: center; margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff, var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 22px; }
+.num-reveal { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 22px; }
+.num-chip {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+  border: 1.5px solid var(--gold-border2); border-radius: 12px;
+  padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 20px;
+  font-weight: 700; color: var(--gold2);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn { from{opacity:0;transform:scale(.3)} to{opacity:1;transform:scale(1)} }
+
+.pay-steps {
+  background: rgba(201,168,76,0.06); border: 1px solid var(--gold-border);
+  border-radius: var(--r); padding: 16px; margin-bottom: 20px;
+}
+.pay-steps h4 { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+.step { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--text2); align-items: flex-start; }
+.step:last-child { margin-bottom: 0; }
+.step-n {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step strong { color: var(--text); }
+.modal-wa {
+  width: 100%; padding: 16px; border-radius: var(--r); border: none;
+  background: linear-gradient(135deg, #128C7E, #25D366);
+  color: #fff; font-family: 'Raleway', sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  margin-bottom: 10px; transition: all .2s;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+}
+.modal-wa:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(37,211,102,0.4); }
+.modal-close {
+  width: 100%; padding: 13px; border-radius: var(--r);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: transparent; color: var(--muted);
+  font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+
+/* PENDING MODAL specific */
+.pending-info {
+  background: rgba(255,140,0,0.07); border: 1px solid rgba(255,140,0,0.2);
+  border-radius: var(--r); padding: 14px; margin-bottom: 20px; font-size: 13px; color: var(--text2); line-height: 1.7;
+}
+.pending-info strong { color: var(--orange); }
+
+/* TC MODAL */
+.tc-content {
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+  max-height: 300px; overflow-y: auto; margin-bottom: 20px;
+  background: rgba(255,255,255,0.02); border-radius: 10px; padding: 14px;
+}
+.tc-content h4 { color: var(--gold); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin: 14px 0 6px; }
+.tc-content h4:first-child { margin-top: 0; }
+
+/* SHARE MODAL */
+.share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.share-btn {
+  padding: 14px 10px; border-radius: var(--r); border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); color: var(--text);
+  font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+}
+.share-btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+.share-btn .sh-icon { font-size: 24px; }
+
+/* SORTEO ANIMATION MODAL */
+.sorteo-anim {
+  text-align: center; padding: 20px 0;
+}
+.sorteo-drum {
+  font-family: 'Cinzel', serif; font-size: 60px; font-weight: 900;
+  color: var(--gold2); margin: 20px 0;
+  animation: drumRoll .15s ease infinite;
+  min-height: 80px; display: flex; align-items: center; justify-content: center;
+  background: var(--gold-dim); border: 2px solid var(--gold-border2);
+  border-radius: var(--r2);
+}
+@keyframes drumRoll { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+.sorteo-drum.final { animation: winReveal 1s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes winReveal {
+  from{transform:scale(.5);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.winner-announce {
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+  color: var(--gold2); margin-top: 16px; display: none;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  text-align: center; padding: 32px 0 20px;
+  border-top: 1px solid var(--gold-border);
+  font-size: 12px; color: var(--muted);
+  position: relative; z-index: 1;
+  margin-top: 20px;
+}
+footer a { color: var(--gold); text-decoration: none; }
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 3px; }
+
+/* ════ ADMIN STYLES (embedded) ════ */
+.admin-portal {
+  display: none; position: fixed; inset: 0;
+  background: var(--bg); z-index: 300; overflow-y: auto;
+}
+.admin-portal.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND EFFECTS -->
+<canvas id="particles"></canvas>
+<div class="bg-glow"></div>
+<div class="bg-noise"></div>
+
+<!-- SUPPORT BUTTON -->
+<a id="supportBtn" href="#" target="_blank">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+  Soporte
+</a>
+
+<!-- ═══════════════════════════════
+     MAIN PUBLIC PAGE
+═══════════════════════════════ -->
+<div id="publicPage">
+<div class="wrap">
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#" id="logoText">SORTEOS VIP</a>
+    <div class="nav-right">
+      <a class="nav-icon" id="igNavBtn" href="#" target="_blank" title="Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+      <a class="nav-icon" id="fbNavBtn" href="#" target="_blank" title="Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <button class="nav-icon" onclick="openShare()" title="Compartir">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+      </button>
+      <button class="nav-icon" id="adminNavBtn" onclick="openAdminLogin()" title="Administración">
+        ⚙️
+        <span class="notif-dot" id="adminNotifDot"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PRIZE HERO -->
+  <div class="prize-hero" id="prizeHero">
+    <div class="prize-img" id="prizeImgWrap">
+      <div class="prize-img-ph" id="prizeImgPh"><span>🏆</span><p>Foto del premio</p></div>
+      <img id="prizeImgEl" src="" alt="" style="display:none">
+      <div class="prize-img-overlay"></div>
+      <div class="prize-corner-deco"></div>
+      <div class="prize-status">
+        <span class="badge badge-live" id="statusBadge"><span class="live-dot"></span>EN VENTA</span>
+        <span class="badge badge-gold" id="priceBadge">$1.000 c/u</span>
+      </div>
+    </div>
+    <div class="prize-body">
+      <h1 class="prize-name" id="prizeName">NOMBRE DEL PREMIO</h1>
+      <p class="prize-desc" id="prizeDesc">Configura el sorteo desde el panel de administración ⚙️</p>
+
+      <!-- COUNTDOWN -->
+      <div class="countdown-wrap" id="countdownWrap">
+        <div class="countdown-label">⏳ Tiempo restante para el sorteo</div>
+        <div class="countdown-timer">
+          <div class="cd-unit"><div class="cd-num" id="cdDays">00</div><div class="cd-lbl">Días</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-unit"><div class="cd-num" id="cdHours">00</div><div class="cd-lbl">Horas</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-unit"><div class="cd-num" id="cdMins">00</div><div class="cd-lbl">Min</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-unit"><div class="cd-num" id="cdSecs">00</div><div class="cd-lbl">Seg</div></div>
+        </div>
+      </div>
+
+      <!-- LOTTERY -->
+      <div class="lottery-row">
+        <span>🎰</span>
+        <div><strong id="lotteryName">Lotería de Medellín</strong> &nbsp;·&nbsp; <span id="lotteryDate">Fecha por confirmar</span></div>
+      </div>
+
+      <!-- SPECIALS -->
+      <div id="specialsWrap" style="display:none">
+        <div class="section-head">
+          <div class="section-title">🥇 Números con Premio Extra</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="specials-grid" id="specialsList"></div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="prog-wrap">
+        <div class="prog-head">
+          <span class="p-label">Boletas vendidas</span>
+          <span class="p-pct" id="soldPct">0%</span>
+        </div>
+        <div class="prog-bg">
+          <div class="prog-fill" id="progFill" style="width:0%"></div>
+        </div>
+        <div class="prog-sub">
+          <span id="availLabel">100 disponibles</span>
+          <span id="soldLabel">0 vendidas</span>
+        </div>
+        <div class="urgency-bar" id="urgencyBar">🔥 ¡Quedan pocos números! Participa ya antes de que se agoten</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSED BANNER -->
+  <div id="closedBanner" style="display:none; background:rgba(255,59,92,0.1); border:1px solid rgba(255,59,92,0.3); border-radius:16px; padding:20px; text-align:center; margin-bottom:24px;">
+    <div style="font-size:32px;margin-bottom:8px">🔒</div>
+    <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--red);margin-bottom:6px">SORTEO CERRADO</div>
+    <div style="font-size:13px;color:var(--text2)" id="closedMsg">Las ventas han sido pausadas temporalmente.</div>
+  </div>
+
+  <!-- PACKS SECTION -->
+  <div id="purchaseSection">
+    <div class="section-head" style="margin-bottom:16px">
+      <div class="section-title">🎟️ Elige tu paquete</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="packs-grid" id="packsGrid"></div>
+    <div class="custom-row">
+      <label>Cantidad personalizada:</label>
+      <div class="qty-ctrl">
+        <button class="qty-b" onclick="chQty(-1)">−</button>
+        <span class="qty-val" id="qtyVal">1</span>
+        <button class="qty-b" onclick="chQty(1)">+</button>
+      </div>
+    </div>
+    <div class="min-notice" id="minNotice">⚠️ Compra mínima: <span id="minVal">1</span> boleta(s)</div>
+
+    <!-- FORM -->
+    <div class="form-card">
+      <div class="form-card-title">📋 Tus datos de participación</div>
+      <div class="returning-banner" id="returningBanner"></div>
+      <div class="fgrid">
+        <div class="frow">
+          <div class="field">
+            <label>Nombre completo *</label>
+            <input type="text" id="fName" placeholder="Tu nombre" autocomplete="name">
+          </div>
+          <div class="field">
+            <label>Teléfono *</label>
+            <input type="tel" id="fPhone" placeholder="3001234567" autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label>Correo electrónico *</label>
+          <input type="email" id="fEmail" placeholder="tu@correo.com" autocomplete="email" oninput="checkReturning()">
+        </div>
+        <div class="field">
+          <label>Instagram</label>
+          <input type="text" id="fIg" placeholder="@tu_usuario">
+        </div>
+      </div>
+
+      <!-- ANTIBOT -->
+      <div style="margin-top:16px">
+        <div class="field"><label>Verificación de seguridad</label></div>
+        <div class="antibot-wrap" id="antibotWrap" onclick="doAntibot()">
+          <div class="antibot-spinner" id="antibotSpinner"></div>
+          <div class="antibot-box" id="antibotBox"></div>
+          <span class="antibot-text" id="antibotText">No soy un robot</span>
+        </div>
+      </div>
+
+      <!-- T&C -->
+      <div class="tc-row" id="tcRow" onclick="toggleTC()">
+        <div class="tc-check" id="tcCheck"></div>
+        <div class="tc-text">Acepto los <a onclick="event.stopPropagation();openTCModal()">términos y condiciones</a> del sorteo y confirmo que mis datos son verídicos.</div>
+      </div>
+
+      <!-- PAYMENT -->
+      <div class="pay-section">
+        <div class="form-card-title" style="margin-bottom:0">💳 Método de pago</div>
+        <div class="pay-grid" id="payGrid"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY & CTA -->
+    <div class="summary">
+      <div class="sum-left">
+        <div class="sum-lbl">Total a pagar</div>
+        <div class="sum-total" id="totalAmt">$1.000</div>
+      </div>
+      <div class="sum-right">
+        <div class="sum-qty"><span id="qtyLabel">1</span> boleta(s)</div>
+        <div class="sum-note">Números asignados al confirmar pago ✨</div>
+      </div>
+    </div>
+    <button class="cta-btn" id="ctaBtn" onclick="doPurchase()">
+      ✦ RESERVAR Y PAGAR AHORA ✦
+    </button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-card" style="margin-top:36px">
+    <div class="section-head" style="margin-bottom:0">
+      <div class="section-title">🔍 Consultar mis números</div>
+      <div class="section-line"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin:10px 0 0">Ingresa tu correo para ver el estado de tus boletas registradas:</p>
+    <div class="search-row">
+      <input type="email" id="searchEmail" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="search-btn" onclick="doSearch()">Buscar</button>
+    </div>
+    <div id="searchResult"></div>
+  </div>
+
+  <!-- NUMBER GRID -->
+  <div class="numgrid-card">
+    <div class="section-head">
+      <div class="section-title">📊 Mapa de boletas</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="numgrid" id="numGrid"></div>
+    <div class="grid-legend">
+      <div class="leg"><div class="leg-dot" style="background:rgba(0,212,106,0.5)"></div>Disponible</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,140,0,0.5)"></div>Reservada</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,59,92,0.4)"></div>Vendida</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(201,168,76,0.5)"></div>Premio extra</div>
+    </div>
+  </div>
+
+  <!-- PAST WINNERS -->
+  <div class="winners-card">
+    <div class="section-head">
+      <div class="section-title">🏆 Ganadores Anteriores</div>
+      <div class="section-line"></div>
+    </div>
+    <div id="winnersList"></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-card">
+    <div class="section-head">
+      <div class="section-title">❓ Preguntas Frecuentes</div>
+      <div class="section-line"></div>
+    </div>
+    <div id="faqList"></div>
+  </div>
+
+</div><!-- /wrap -->
+</div><!-- /publicPage -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- RESERVATION MODAL -->
+<div class="overlay" id="reserveModal">
+  <div class="modal">
+    <div class="modal-icon">⏳</div>
+    <h2 class="modal-title">¡Boletas Reservadas!</h2>
+    <p class="modal-sub">Tienes <strong id="reserveTimer" style="color:var(--gold)">15:00</strong> para completar el pago</p>
+    <div style="text-align:center;margin-bottom:16px">
+      <span style="display:inline-flex;align-items:center;gap:6px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:100px;padding:5px 16px;font-size:12px;color:var(--gold)" id="reserveBuyerTag">👤 Comprador</span>
+    </div>
+    <div class="pending-info">
+      Tus números están <strong>reservados temporalmente</strong>. Para confirmarlos, realiza el pago y envía el comprobante por WhatsApp. Si no se confirma el pago, los números se liberarán automáticamente.
+    </div>
+    <div class="pay-steps">
+      <h4>📌 Pasos para confirmar</h4>
+      <div class="step"><div class="step-n">1</div><div>Realiza la transferencia de <strong id="reserveTotal">$1.000</strong> al método elegido</div></div>
+      <div class="step"><div class="step-n">2</div><div>Toma captura del <strong>comprobante</strong></div></div>
+      <div class="step"><div class="step-n">3</div><div>Envíala por <strong>WhatsApp</strong> — los números se asignan al confirmar tu pago</div></div>
+    </div>
+    <button class="modal-wa" onclick="openWaPending()">📲 Enviar comprobante por WhatsApp</button>
+    <button class="modal-close" onclick="closeModal('reserveModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- NUMBERS ASSIGNED MODAL -->
+<div class="overlay" id="numbersModal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <h2 class="modal-title">¡Números Asignados!</h2>
+    <p class="modal-sub">Tu pago fue confirmado. Estos son tus números oficiales:</p>
+    <div class="num-reveal" id="numReveal"></div>
+    <div class="pay-steps">
+      <h4>✅ Participación confirmada</h4>
+      <div class="step"><div class="step-n">🎰</div><div>El sorteo se realizará con la <strong id="modalLottery">Lotería</strong> el <strong id="modalDate">fecha</strong></div></div>
+      <div class="step"><div class="step-n">📱</div><div>Te contactaremos por <strong>WhatsApp e Instagram</strong> si eres el ganador</div></div>
+    </div>
+    <button class="modal-wa" onclick="openWaConfirmed()">📲 Compartir mis números por WhatsApp</button>
+    <button class="modal-close" onclick="closeModal('numbersModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- T&C MODAL -->
+<div class="overlay" id="tcModal">
+  <div class="modal">
+    <h2 class="modal-title" style="font-size:20px;margin-bottom:14px">📜 Términos y Condiciones</h2>
+    <div class="tc-content" id="tcContent"></div>
+    <button class="cta-btn" onclick="acceptTC()" style="font-size:14px;padding:14px">✓ Entendido y acepto</button>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-icon">📢</div>
+    <h2 class="modal-title">Compartir Sorteo</h2>
+    <p class="modal-sub">Invita a tus amigos a participar</p>
+    <div class="share-grid">
+      <button class="share-btn" onclick="shareWa()"><span class="sh-icon">💬</span>WhatsApp</button>
+      <button class="share-btn" onclick="shareIg()"><span class="sh-icon">📸</span>Instagram</button>
+      <button class="share-btn" onclick="shareFb()"><span class="sh-icon">👥</span>Facebook</button>
+      <button class="share-btn" onclick="copyLink()"><span class="sh-icon">🔗</span>Copiar Link</button>
+    </div>
+    <button class="modal-close" onclick="closeModal('shareModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="overlay" id="loginModal">
+  <div class="modal">
+    <div class="modal-icon">🔐</div>
+    <h2 class="modal-title">Panel de Administración</h2>
+    <p class="modal-sub">Acceso restringido. Solo personal autorizado.</p>
+    <div class="field" style="margin-bottom:14px">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="cta-btn" onclick="doLogin()" style="font-size:15px;padding:14px;margin-bottom:10px">🔓 Ingresar</button>
+    <button class="modal-close" onclick="closeModal('loginModal')">Cancelar</button>
+    <p id="loginErr" style="text-align:center;color:var(--red);font-size:12px;margin-top:10px;display:none">Contraseña incorrecta. Intenta de nuevo.</p>
+  </div>
+</div>
+
+<!-- ADMIN PORTAL (full screen) -->
+<div class="admin-portal" id="adminPortal">
+  <!-- Admin is injected by JS -->
+</div>
+
+<footer>
+  <p>✦ <span id="footerName">Sorteos VIP</span> ✦ · Sorteos seguros y transparentes · <a onclick="openTCModal()">Términos y condiciones</a></p>
+  <p style="margin-top:6px;font-size:11px">Los números se asignan aleatoriamente al confirmar el pago · Números de 5 cifras del 00000 al 99999</p>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PARTICLES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(function(){
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  for(let i=0;i<60;i++) pts.push({
+    x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+    vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+    r: Math.random()*1.5+.5,
+    a: Math.random()
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(201,168,76,${p.a*0.4})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STORAGE & STATE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const KEY = 'svip_v4';
+
+const DEFAULT = {
+  cfg: {
+    name: 'SORTEOS VIP',
+    prizeName: 'NOMBRE DEL PREMIO',
+    prizeDesc: 'Configura el sorteo desde el panel de administración.',
+    prizeImg: '',
+    numFrom: 0, numTo: 99999,
+    price: 1000,
+    minBuy: 1,
+    lottery: 'Lotería de Medellín',
+    lotteryDate: '',
+    drawDate: '',
+    specials: [],
+    ig: '', fb: '', wa: '', supportWa: '',
+    payments: [
+      { name:'Nequi', icon:'💚', detail:'300 123 4567' },
+      { name:'Bancolombia', icon:'🏦', detail:'Cuenta: 000-000000-00' },
+      { name:'Daviplata', icon:'💜', detail:'300 987 6543' },
+      { name:'PSE / Transferencia', icon:'🏛️', detail:'Banco Bogotá - Cuenta' }
+    ],
+    closed: false,
+    closedMsg: 'Las ventas han sido pausadas temporalmente.',
+    hotPack: 5,
+    packs: [1,3,5,10,20,50],
+    tc: 'Al participar en este sorteo, el usuario acepta que los números son asignados de forma aleatoria. Los pagos deben ser confirmados por el organizador. El ganador es determinado según el número de la lotería oficial indicada. El organizador no se hace responsable por datos incorrectos proporcionados por el participante.',
+    faq: [
+      { q:'¿Cómo se asignan los números?', a:'Los números son asignados de forma completamente aleatoria por el sistema, luego de que el organizador confirme tu pago.' },
+      { q:'¿Cuándo se realiza el sorteo?', a:'El sorteo se realiza con el número ganador de la lotería oficial indicada en la fecha establecida.' },
+      { q:'¿Cómo sé si gané?', a:'Te contactaremos directamente por WhatsApp e Instagram con los datos que nos proporcionaste.' },
+      { q:'¿Puedo comprar más de un paquete?', a:'Sí, puedes realizar múltiples compras. Cada compra se registra por separado.' },
+      { q:'¿Qué pasa si ya no hay números disponibles?', a:'El sorteo se cierra cuando todos los números están vendidos.' }
+    ],
+    adminPass: 'admin123',
+    users: [{ user:'admin', pass:'admin123', role:'owner', name:'Administrador' }],
+    soldBase: 0,
+    winners: [],
+    reserveMinutes: 15,
+    auditLog: []
+  },
+  orders: {}
+};
+
+let state = loadState();
+let selQty = state.cfg.minBuy || 1;
+let selPay = 0;
+let antibotDone = false;
+let tcAccepted = false;
+let reserveInterval = null;
+let cdInterval = null;
+let currentAdminUser = null;
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      // Deep merge cfg
+      d.cfg = Object.assign({}, DEFAULT.cfg, d.cfg);
+      if(!d.orders) d.orders = {};
+      return d;
+    }
+  } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+function saveState(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ORDER HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// order: { id, name, phone, email, ig, qty, pay, total, status:'pending'|'confirmed'|'rejected', numbers:[], ts, reserveUntil }
+
+function getAllOrders(){ return Object.values(state.orders); }
+
+function getSoldNums(){
+  const s = new Set();
+  getAllOrders().filter(o=>o.status==='confirmed').forEach(o=> o.numbers.forEach(n=>s.add(n)));
+  return s;
+}
+
+function getPendingNums(){
+  const s = new Set();
+  const now = Date.now();
+  getAllOrders().filter(o=>o.status==='pending' && o.reserveUntil > now).forEach(o=> o.numbers.forEach(n=>s.add(n)));
+  return s;
+}
+
+function getAvailNums(){
+  const sold = getSoldNums();
+  const pending = getPendingNums();
+  const avail = [];
+  for(let i=state.cfg.numFrom; i<=state.cfg.numTo; i++){
+    if(!sold.has(i) && !pending.has(i)) avail.push(i);
+  }
+  return avail;
+}
+
+function getTotalRange(){ return state.cfg.numTo - state.cfg.numFrom + 1; }
+
+function getTotalSold(){
+  return getSoldNums().size + state.cfg.soldBase;
+}
+
+function genOrderId(){
+  return 'ORD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+}
+
+function padNum(n){
+  const digits = state.cfg.numTo.toString().length;
+  return String(n).padStart(digits,'0');
+}
+
+function fmtCOP(n){ return Number(n).toLocaleString('es-CO'); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RENDER PUBLIC
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderPublic(){
+  const c = state.cfg;
+  document.getElementById('pageTitle').textContent = c.name;
+  document.getElementById('logoText').textContent = c.name;
+  document.getElementById('footerName').textContent = c.name;
+  document.getElementById('prizeName').textContent = c.prizeName;
+  document.getElementById('prizeDesc').textContent = c.prizeDesc;
+  document.getElementById('priceBadge').textContent = `$${fmtCOP(c.price)} c/u`;
+  document.getElementById('lotteryName').textContent = c.lottery;
+  document.getElementById('lotteryDate').textContent = c.lotteryDate || 'Fecha por confirmar';
+
+  // Image
+  const img = document.getElementById('prizeImgEl');
+  const ph = document.getElementById('prizeImgPh');
+  if(c.prizeImg){ img.src=c.prizeImg; img.style.display='block'; ph.style.display='none'; }
+  else { img.style.display='none'; ph.style.display='flex'; }
+
+  // Socials
+  document.getElementById('igNavBtn').href = c.ig || '#';
+  document.getElementById('fbNavBtn').href = c.fb || '#';
+  const sBtn = document.getElementById('supportBtn');
+  if(c.supportWa){ sBtn.href=`https://wa.me/${c.supportWa}`; sBtn.style.display='flex'; }
+  else { sBtn.style.display='none'; }
+
+  // Closed
+  const closed = c.closed;
+  document.getElementById('closedBanner').style.display = closed ? 'block' : 'none';
+  document.getElementById('purchaseSection').style.display = closed ? 'none' : 'block';
+  document.getElementById('closedMsg').textContent = c.closedMsg;
+
+  // Status badge
+  const sb = document.getElementById('statusBadge');
+  if(closed){ sb.className='badge badge-closed'; sb.innerHTML='🔒 CERRADO'; }
+  else { sb.className='badge badge-live'; sb.innerHTML='<span class="live-dot"></span>EN VENTA'; }
+
+  // Progress
+  const total = getTotalRange();
+  const sold = getTotalSold();
+  const pending = getPendingNums().size;
+  const pct = total > 0 ? Math.round((sold/total)*100) : 0;
+  const availCount = total - getSoldNums().size - pending - state.cfg.soldBase;
+  document.getElementById('soldPct').textContent = pct + '%';
+  document.getElementById('availLabel').textContent = Math.max(0,availCount) + ' disponibles';
+  document.getElementById('soldLabel').textContent = sold + ' vendidas';
+  setTimeout(()=>{ document.getElementById('progFill').style.width = pct+'%'; },300);
+
+  // Urgency
+  const urgency = document.getElementById('urgencyBar');
+  if(pct >= 80) urgency.classList.add('show');
+  else urgency.classList.remove('show');
+
+  // Countdown
+  if(c.drawDate){ startCountdown(c.drawDate); document.getElementById('countdownWrap').style.display='block'; }
+  else document.getElementById('countdownWrap').style.display='none';
+
+  // Specials
+  const sw = document.getElementById('specialsWrap');
+  const sl = document.getElementById('specialsList');
+  sl.innerHTML='';
+  if(c.specials && c.specials.length > 0){
+    sw.style.display='block';
+    c.specials.forEach(s=>{
+      const el = document.createElement('div');
+      el.className='sp-chip';
+      el.innerHTML=`<span class="sp-num">${padNum(s.num)}</span><span class="sp-lbl">${s.label}</span>`;
+      sl.appendChild(el);
+    });
+  } else sw.style.display='none';
+
+  // Min notice
+  selQty = Math.max(selQty, c.minBuy);
+  document.getElementById('minVal').textContent = c.minBuy;
+  document.getElementById('qtyVal').textContent = selQty;
+  if(c.minBuy > 1) document.getElementById('minNotice').classList.add('show');
+  else document.getElementById('minNotice').classList.remove('show');
+
+  // Packs
+  renderPacks();
+
+  // Payments
+  renderPayments();
+
+  // Total
+  updateTotal();
+
+  // Grid
+  renderGrid();
+
+  // Winners
+  renderWinners();
+
+  // FAQ
+  renderFAQ();
+
+  // Notification dot
+  const pending_orders = getAllOrders().filter(o=>o.status==='pending');
+  document.getElementById('adminNotifDot').classList.toggle('show', pending_orders.length > 0);
+}
+
+function renderPacks(){
+  const g = document.getElementById('packsGrid');
+  g.innerHTML='';
+  const c = state.cfg;
+  const packs = (c.packs || [1,3,5,10,20,50]).filter(p=>p>=c.minBuy);
+  packs.forEach(p=>{
+    const isHot = p === c.hotPack;
+    const el = document.createElement('div');
+    el.className=`pack${isHot?' hot':''}${p===selQty?' selected':''}`;
+    if(isHot) el.innerHTML='<div class="pack-hot-tag">⭐ Popular</div>';
+    el.innerHTML+=`<div class="pack-qty">${p}</div><div class="pack-lbl">boleta${p!==1?'s':''}</div><div class="pack-price">$${fmtCOP(p*c.price)}</div><div class="pack-unit">$${fmtCOP(c.price)} c/u</div>`;
+    el.onclick=()=>{ selQty=p; document.getElementById('qtyVal').textContent=p; renderPacks(); updateTotal(); };
+    g.appendChild(el);
+  });
+}
+
+function renderPayments(){
+  const g = document.getElementById('payGrid');
+  g.innerHTML='';
+  state.cfg.payments.forEach((pm,i)=>{
+    const el=document.createElement('div');
+    el.className=`pay-m${i===selPay?' selected':''}`;
+    el.innerHTML=`<div class="pay-icon">${pm.icon||'💳'}</div><div class="pay-info"><div class="pay-name">${pm.name}</div><div class="pay-detail">${pm.detail}</div></div><div class="pay-radio"></div>`;
+    el.onclick=()=>{ selPay=i; renderPayments(); };
+    g.appendChild(el);
+  });
+}
+
+function updateTotal(){
+  const t = selQty * state.cfg.price;
+  document.getElementById('totalAmt').textContent = `$${fmtCOP(t)}`;
+  document.getElementById('qtyLabel').textContent = selQty;
+}
+
+function renderGrid(){
+  const g = document.getElementById('numGrid');
+  g.innerHTML='';
+  const sold = getSoldNums();
+  const pending = getPendingNums();
+  const specials = new Set((state.cfg.specials||[]).map(s=>parseInt(s.num)));
+  const total = getTotalRange();
+  // For large ranges, show summary
+  if(total > 1000){
+    g.style.display='block';
+    const pct = Math.round((getTotalSold()/total)*100);
+    g.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;font-size:13px;color:var(--text2)">El rango de números es muy amplio para mostrar individualmente.<br><strong style="color:var(--gold)">${getTotalSold()} vendidas · ${pct}% completado</strong></div>`;
+    return;
+  }
+  for(let i=state.cfg.numFrom; i<=state.cfg.numTo; i++){
+    const el=document.createElement('div');
+    const isSold=sold.has(i);
+    const isPend=pending.has(i);
+    const isSpec=specials.has(i);
+    let cls='ng ';
+    if(isSold) cls+='sold';
+    else if(isPend) cls+='pending';
+    else cls+='avail';
+    if(isSpec && !isSold) cls+=' special';
+    el.className=cls;
+    el.textContent=padNum(i);
+    el.title=`${padNum(i)} — ${isSold?'Vendida':isPend?'Reservada':'Disponible'}`;
+    g.appendChild(el);
+  }
+}
+
+function renderWinners(){
+  const el=document.getElementById('winnersList');
+  const winners=state.cfg.winners||[];
+  if(winners.length===0){
+    el.innerHTML='<div class="no-winners">Aquí aparecerán los ganadores de sorteos anteriores 🏆</div>';
+    return;
+  }
+  el.innerHTML='';
+  [...winners].reverse().forEach(w=>{
+    const d=document.createElement('div');
+    d.className='winner-item';
+    d.innerHTML=`<div class="winner-trophy">🏆</div><div class="winner-info"><div class="winner-name">${w.name}</div><div class="winner-prize">${w.prize} · ${w.date}</div></div><div class="winner-num">${padNum(w.winNum)}</div>`;
+    el.appendChild(d);
+  });
+}
+
+function renderFAQ(){
+  const el=document.getElementById('faqList');
+  el.innerHTML='';
+  (state.cfg.faq||[]).forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='faq-item';
+    d.innerHTML=`<div class="faq-q" onclick="toggleFAQ(${i})"><span>${f.q}</span><span class="faq-arrow">▼</span></div><div class="faq-a">${f.a}</div>`;
+    el.appendChild(d);
+  });
+}
+
+function toggleFAQ(i){
+  const items=document.querySelectorAll('.faq-item');
+  items[i].classList.toggle('open');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COUNTDOWN
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function startCountdown(dateStr){
+  if(cdInterval) clearInterval(cdInterval);
+  function tick(){
+    const diff = new Date(dateStr) - Date.now();
+    if(diff<=0){ ['cdDays','cdHours','cdMins','cdSecs'].forEach(id=>document.getElementById(id).textContent='00'); return; }
+    const days=Math.floor(diff/86400000);
+    const hrs=Math.floor((diff%86400000)/3600000);
+    const mins=Math.floor((diff%3600000)/60000);
+    const secs=Math.floor((diff%60000)/1000);
+    document.getElementById('cdDays').textContent=String(days).padStart(2,'0');
+    document.getElementById('cdHours').textContent=String(hrs).padStart(2,'0');
+    document.getElementById('cdMins').textContent=String(mins).padStart(2,'0');
+    document.getElementById('cdSecs').textContent=String(secs).padStart(2,'0');
+  }
+  tick();
+  cdInterval=setInterval(tick,1000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ANTIBOT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function doAntibot(){
+  if(antibotDone) return;
+  const wrap=document.getElementById('antibotWrap');
+  wrap.classList.add('loading');
+  document.getElementById('antibotText').textContent='Verificando...';
+  setTimeout(()=>{
+    wrap.classList.remove('loading');
+    wrap.classList.add('done');
+    document.getElementById('antibotText').textContent='✓ Verificación completada';
+    antibotDone=true;
+  }, 1400+Math.random()*800);
+}
+
+function toggleTC(){
+  if(!antibotDone){ alert('Por favor completa la verificación de seguridad primero.'); return; }
+  tcAccepted=!tcAccepted;
+  document.getElementById('tcRow').classList.toggle('checked',tcAccepted);
+  document.getElementById('tcCheck').textContent=tcAccepted?'✓':'';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RETURNING BUYER CHECK
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function checkReturning(){
+  const email=document.getElementById('fEmail').value.trim().toLowerCase();
+  const banner=document.getElementById('returningBanner');
+  if(!email.includes('@')){ banner.classList.remove('show'); return; }
+  const myOrders=getAllOrders().filter(o=>o.email===email && o.status==='confirmed');
+  if(myOrders.length>0){
+    const totalBought=myOrders.reduce((s,o)=>s+o.qty,0);
+    banner.textContent=`👋 ¡Bienvenido de nuevo! Llevas ${totalBought} boleta${totalBought!==1?'s':''} en este sorteo.`;
+    banner.classList.add('show');
+    const first=myOrders[0];
+    if(!document.getElementById('fName').value) document.getElementById('fName').value=first.name;
+    if(!document.getElementById('fPhone').value) document.getElementById('fPhone').value=first.phone;
+    if(!document.getElementById('fIg').value && first.ig) document.getElementById('fIg').value=first.ig;
+  } else banner.classList.remove('show');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// QTY CONTROL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function chQty(d){
+  const min=state.cfg.minBuy||1;
+  const avail=getAvailNums().length;
+  selQty=Math.max(min, Math.min(selQty+d, avail, getTotalRange()));
+  document.getElementById('qtyVal').textContent=selQty;
+  document.querySelectorAll('.pack').forEach(el=>el.classList.remove('selected'));
+  updateTotal();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PURCHASE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let pendingOrder = null;
+
+function doPurchase(){
+  const name=document.getElementById('fName').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  const email=document.getElementById('fEmail').value.trim().toLowerCase();
+  const ig=document.getElementById('fIg').value.trim();
+
+  if(!name){ shakeField('fName'); return alert('Ingresa tu nombre completo.'); }
+  if(!phone||phone.length<7){ shakeField('fPhone'); return alert('Ingresa un teléfono válido.'); }
+  if(!email||!email.includes('@')){ shakeField('fEmail'); return alert('Ingresa un correo válido.'); }
+  if(!antibotDone) return alert('Por favor completa la verificación de seguridad.');
+  if(!tcAccepted) return alert('Debes aceptar los términos y condiciones.');
+
+  const min=state.cfg.minBuy||1;
+  if(selQty<min) return alert(`La compra mínima es de ${min} boleta(s).`);
+
+  const avail=getAvailNums();
+  if(avail.length<selQty) return alert(`Solo quedan ${avail.length} números disponibles.`);
+
+  const orderId=genOrderId();
+  const reserveMs=(state.cfg.reserveMinutes||15)*60*1000;
+  const total=selQty*state.cfg.price;
+  const pm=state.cfg.payments[selPay];
+
+  // Create pending order (no numbers assigned yet — assigned on payment confirm)
+  const order={
+    id: orderId, name, phone, email, ig,
+    qty: selQty, pay: pm.name, total,
+    status:'pending',
+    numbers:[],
+    ts: Date.now(),
+    reserveUntil: Date.now()+reserveMs,
+    payMethod: pm
+  };
+  state.orders[orderId]=order;
+  addAuditLog(`Nueva reserva: ${name} (${email}) x${selQty} boletas`);
+  saveState();
+  renderPublic();
+
+  pendingOrder=order;
+
+  // Show modal
+  document.getElementById('reserveBuyerTag').textContent=`👤 ${name}`;
+  document.getElementById('reserveTotal').textContent=`$${fmtCOP(total)}`;
+  openModal('reserveModal');
+  startReserveTimer(order);
+}
+
+function startReserveTimer(order){
+  if(reserveInterval) clearInterval(reserveInterval);
+  function tick(){
+    const rem=order.reserveUntil-Date.now();
+    if(rem<=0){
+      clearInterval(reserveInterval);
+      document.getElementById('reserveTimer').textContent='00:00';
+      // Auto-expire
+      if(state.orders[order.id] && state.orders[order.id].status==='pending'){
+        state.orders[order.id].status='expired';
+        saveState();
+        renderPublic();
+      }
+      return;
+    }
+    const m=Math.floor(rem/60000);
+    const s=Math.floor((rem%60000)/1000);
+    document.getElementById('reserveTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  tick();
+  reserveInterval=setInterval(tick,1000);
+}
+
+function openWaPending(){
+  if(!state.cfg.wa && !state.cfg.supportWa) return alert('El organizador aún no ha configurado el WhatsApp de soporte.');
+  const wa=state.cfg.wa||state.cfg.supportWa;
+  const o=pendingOrder;
+  const pm=o.payMethod;
+  const msg=`🎟️ *RESERVA DE BOLETAS*\n\n`+
+    `ID: *${o.id}*\n`+
+    `👤 Nombre: ${o.name}\n`+
+    `📱 Teléfono: ${o.phone}\n`+
+    `📧 Correo: ${o.email}\n`+
+    `📸 Instagram: ${o.ig||'N/A'}\n\n`+
+    `🎰 Sorteo: *${state.cfg.prizeName}*\n`+
+    `🎟️ Boletas reservadas: *${o.qty}*\n`+
+    `💰 Total: *$${fmtCOP(o.total)}*\n`+
+    `💳 Método de pago: ${pm.name} (${pm.detail})\n\n`+
+    `Adjunto comprobante de pago ✅`;
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SEARCH
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function doSearch(){
+  const email=document.getElementById('searchEmail').value.trim().toLowerCase();
+  const res=document.getElementById('searchResult');
+  if(!email||!email.includes('@')){ res.innerHTML='<div class="sr-none">Ingresa un correo válido.</div>'; return; }
+  const myOrders=getAllOrders().filter(o=>o.email===email && (o.status==='confirmed'||o.status==='pending'));
+  if(myOrders.length===0){ res.innerHTML='<div class="sr-none">No se encontraron boletas con ese correo.</div>'; return; }
+  let html='<div class="sr-found">';
+  const name=myOrders[0].name;
+  const confirmed=myOrders.filter(o=>o.status==='confirmed');
+  const pending=myOrders.filter(o=>o.status==='pending' && o.reserveUntil>Date.now());
+  html+=`<div class="sr-name">📋 Boletas de ${name}</div>`;
+  if(confirmed.length>0){
+    html+='<div style="font-size:11px;color:var(--green);margin-bottom:6px;font-weight:700">✅ CONFIRMADAS</div><div class="sr-chips">';
+    confirmed.forEach(o=>o.numbers.forEach(n=>{ html+=`<div class="sr-chip">${padNum(n)}</div>`; }));
+    html+='</div>';
+  }
+  if(pending.length>0){
+    html+='<div style="font-size:11px;color:var(--orange);margin:10px 0 6px;font-weight:700">⏳ PENDIENTE DE CONFIRMACIÓN</div><div class="sr-chips">';
+    pending.forEach(o=>{ html+=`<div class="sr-chip pending">${o.qty} boleta${o.qty!==1?'s':''} reservadas — ID: ${o.id}</div>`; });
+    html+='</div>';
+  }
+  html+='</div>';
+  res.innerHTML=html;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MODALS HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); });
+});
+
+function openTCModal(){
+  document.getElementById('tcContent').innerHTML=`
+    <h4>1. Participación</h4>${state.cfg.tc}
+    <h4>2. Privacidad</h4>Los datos personales son utilizados exclusivamente para identificar al ganador y contactarlo. No serán compartidos con terceros.
+    <h4>3. Asignación de números</h4>Los números son asignados de forma aleatoria por el sistema únicamente después de confirmar el pago.
+    <h4>4. Pago</h4>El organizador confirmará el pago manualmente. Si no se confirma en el tiempo de reserva, los números serán liberados.
+  `;
+  openModal('tcModal');
+}
+
+function acceptTC(){
+  tcAccepted=true;
+  document.getElementById('tcRow').classList.add('checked');
+  document.getElementById('tcCheck').textContent='✓';
+  closeModal('tcModal');
+}
+
+function openShare(){ openModal('shareModal'); }
+function shareWa(){
+  const msg=`🎟️ ¡Participa en el sorteo de *${state.cfg.prizeName}*! Solo por $${fmtCOP(state.cfg.price)} por boleta. Entra y reserva los tuyos 🏆`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+function shareIg(){ window.open('https://www.instagram.com/','_blank'); }
+function shareFb(){ window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,'_blank'); }
+function copyLink(){
+  navigator.clipboard.writeText(location.href).then(()=>alert('¡Link copiado!')).catch(()=>alert(location.href));
+}
+
+function openWaConfirmed(){
+  if(!state.cfg.wa) return;
+  const o=window._confirmedOrder;
+  if(!o) return;
+  const nums=o.numbers.map(n=>padNum(n)).join(', ');
+  const msg=`🎉 ¡Participando en *${state.cfg.prizeName}*!\n\n🎟️ Mis números: *${nums}*\n🎰 Lotería: ${state.cfg.lottery}\n📅 Fecha: ${state.cfg.lotteryDate}\n\n¡Suerte para todos! 🍀`;
+  window.open(`https://wa.me/${state.cfg.wa}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function shakeField(id){
+  const el=document.getElementById(id);
+  el.style.borderColor='var(--red)';
+  el.style.animation='shake .4s ease';
+  setTimeout(()=>{ el.style.animation=''; el.style.borderColor=''; },1000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ADMIN LOGIN
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openAdminLogin(){ openModal('loginModal'); document.getElementById('loginPass').value=''; document.getElementById('loginErr').style.display='none'; }
+
+function doLogin(){
+  const pass=document.getElementById('loginPass').value;
+  const users=state.cfg.users||[];
+  const user=users.find(u=>u.pass===pass);
+  if(!user && pass!==state.cfg.adminPass){
+    document.getElementById('loginErr').style.display='block';
+    addAuditLog('⚠️ Intento de acceso fallido');
+    return;
+  }
+  currentAdminUser = user || { user:'owner', role:'owner', name:'Dueño' };
+  closeModal('loginModal');
+  openAdminPortal();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ADMIN PORTAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openAdminPortal(){
+  const portal=document.getElementById('adminPortal');
+  portal.classList.add('show');
+  renderAdminPortal();
+}
+
+function closeAdminPortal(){
+  document.getElementById('adminPortal').classList.remove('show');
+  currentAdminUser=null;
+  renderPublic();
+}
+
+let adminTab='dashboard';
+function setAdminTab(t){ adminTab=t; renderAdminPortal(); }
+
+function renderAdminPortal(){
+  const portal=document.getElementById('adminPortal');
+  const isOwner=currentAdminUser&&(currentAdminUser.role==='owner');
+  const allOrders=getAllOrders();
+  const pendingOrders=allOrders.filter(o=>o.status==='pending'&&o.reserveUntil>Date.now());
+  const confirmedOrders=allOrders.filter(o=>o.status==='confirmed');
+  const totalRevenue=confirmedOrders.reduce((s,o)=>s+o.total,0);
+  const topBuyers={};
+  confirmedOrders.forEach(o=>{ topBuyers[o.email]=(topBuyers[o.email]||{name:o.name,qty:0,total:0}); topBuyers[o.email].qty+=o.qty; topBuyers[o.email].total+=o.total; });
+  const topList=Object.entries(topBuyers).sort((a,b)=>b[1].qty-a[1].qty).slice(0,5);
+
+  portal.innerHTML=`
+  <style>
+    .adm-wrap{max-width:900px;margin:0 auto;padding:0 16px 40px}
+    .adm-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--gold-border);margin-bottom:24px;position:sticky;top:0;background:var(--bg);z-index:10;backdrop-filter:blur(20px)}
+    .adm-logo{font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:var(--gold)}
+    .adm-tabs{display:flex;gap:4px;flex-wrap:wrap}
+    .adm-tab{padding:7px 14px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);font-family:'Raleway',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .2s}
+    .adm-tab.active{background:var(--gold-dim);border-color:var(--gold-border2);color:var(--gold)}
+    .adm-tab:hover{background:rgba(255,255,255,0.08)}
+    .adm-logout{padding:7px 14px;border-radius:100px;border:1px solid rgba(255,59,92,0.3);background:rgba(255,59,92,0.08);font-family:'Raleway',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--red);transition:all .2s}
+    .adm-logout:hover{background:rgba(255,59,92,0.15)}
+    .adm-user{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+    .stat{background:var(--card);border:1px solid var(--gold-border);border-radius:var(--r);padding:18px;text-align:center}
+    .stat-val{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--gold2);margin-bottom:4px}
+    .stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .adm-card{background:var(--card);border:1px solid var(--gold-border);border-radius:var(--r2);padding:22px;margin-bottom:20px}
+    .adm-card-title{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .order-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:var(--r);background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;flex-wrap:wrap}
+    .order-row:hover{background:rgba(255,255,255,0.05)}
+    .ord-id{font-family:'Cinzel',serif;font-size:11px;color:var(--muted);min-width:110px}
+    .ord-name{font-size:13px;font-weight:600;flex:1;min-width:100px}
+    .ord-qty{font-size:12px;color:var(--gold)}
+    .ord-total{font-size:13px;font-weight:700;color:var(--gold2);min-width:80px;text-align:right}
+    .ord-status{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+    .s-pending{background:rgba(255,140,0,0.15);color:var(--orange);border:1px solid rgba(255,140,0,0.3)}
+    .s-confirmed{background:rgba(0,212,106,0.1);color:var(--green);border:1px solid rgba(0,212,106,0.2)}
+    .s-rejected{background:rgba(255,59,92,0.1);color:var(--red);border:1px solid rgba(255,59,92,0.2)}
+    .s-expired{background:rgba(90,85,112,0.2);color:var(--muted);border:1px solid rgba(90,85,112,0.3)}
+    .ord-actions{display:flex;gap:6px}
+    .btn-confirm{padding:5px 12px;border-radius:8px;border:1px solid rgba(0,212,106,0.4);background:rgba(0,212,106,0.1);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-confirm:hover{background:rgba(0,212,106,0.2)}
+    .btn-reject{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,59,92,0.3);background:rgba(255,59,92,0.08);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-reject:hover{background:rgba(255,59,92,0.15)}
+    .af{margin-bottom:14px}
+    .af label{display:block;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .af input,.af textarea,.af select{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;font-family:'Raleway',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;resize:none}
+    .af input:focus,.af textarea:focus{border-color:var(--gold)}
+    .af-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:500px){.af-row{grid-template-columns:1fr}}
+    .save-btn{width:100%;padding:13px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-family:'Cinzel',serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .2s;margin-top:4px}
+    .save-btn:hover{opacity:.85;transform:translateY(-1px)}
+    .danger-btn{width:100%;padding:11px;border-radius:var(--r);border:1.5px solid rgba(255,59,92,0.3);background:rgba(255,59,92,0.08);color:var(--red);font-family:'Raleway',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+    .danger-btn:hover{background:rgba(255,59,92,0.15)}
+    .top-buyer{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);margin-bottom:6px}
+    .tb-rank{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);min-width:28px}
+    .tb-name{flex:1;font-size:13px;font-weight:600}
+    .tb-qty{font-size:12px;color:var(--gold);font-weight:700}
+    .log-item{font-size:11px;color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace}
+    .pm-row{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+    .pm-row input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Raleway',sans-serif;font-size:12px;outline:none}
+    .pm-del{background:rgba(255,59,92,0.1);border:1px solid rgba(255,59,92,0.3);border-radius:6px;padding:3px 8px;color:var(--red);font-size:11px;cursor:pointer;font-weight:700}
+    .user-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+    .user-role-badge{padding:2px 8px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+    .role-owner{background:rgba(201,168,76,0.2);color:var(--gold)}
+    .role-staff{background:rgba(74,158,255,0.15);color:var(--blue)}
+  </style>
+  <div class="adm-wrap">
+    <div class="adm-nav">
+      <div class="adm-logo">⚙️ ADMIN PANEL</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <div class="adm-user">👤 ${currentAdminUser.name} <span style="color:var(--gold);font-size:9px;background:var(--gold-dim);padding:2px 8px;border-radius:100px">${currentAdminUser.role==='owner'?'DUEÑO':'STAFF'}</span></div>
+        <button class="adm-logout" onclick="closeAdminPortal()">← Salir</button>
+      </div>
+    </div>
+    <div class="adm-tabs" style="margin-bottom:24px">
+      <button class="adm-tab ${adminTab==='dashboard'?'active':''}" onclick="setAdminTab('dashboard')">📊 Dashboard</button>
+      <button class="adm-tab ${adminTab==='orders'?'active':''}" onclick="setAdminTab('orders')">🎟️ Órdenes ${pendingOrders.length>0?`<span style="background:var(--red);color:#fff;border-radius:100px;padding:1px 6px;font-size:9px;margin-left:4px">${pendingOrders.length}</span>`:''}</button>
+      ${isOwner?`<button class="adm-tab ${adminTab==='config'?'active':''}" onclick="setAdminTab('config')">🎰 Sorteo</button>`:''}
+      ${isOwner?`<button class="adm-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">💳 Pagos</button>`:''}
+      ${isOwner?`<button class="adm-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">👥 Equipo</button>`:''}
+      ${isOwner?`<button class="adm-tab ${adminTab==='draw'?'active':''}" onclick="setAdminTab('draw')">🎰 Realizar Sorteo</button>`:''}
+      ${isOwner?`<button class="adm-tab ${adminTab==='log'?'active':''}" onclick="setAdminTab('log')">📋 Log</button>`:''}
+    </div>
+
+    ${adminTab==='dashboard'?renderDashboard(allOrders,confirmedOrders,pendingOrders,totalRevenue,topList):''}
+    ${adminTab==='orders'?renderOrders(allOrders):''}
+    ${adminTab==='config'&&isOwner?renderConfig():''}
+    ${adminTab==='payments'&&isOwner?renderPaymentsAdmin():''}
+    ${adminTab==='users'&&isOwner?renderUsers():''}
+    ${adminTab==='draw'&&isOwner?renderDraw():''}
+    ${adminTab==='log'&&isOwner?renderLog():''}
+  </div>`;
+}
+
+function renderDashboard(all,confirmed,pending,revenue,top){
+  const total=getTotalRange();
+  const sold=getTotalSold();
+  const pct=total>0?Math.round((sold/total)*100):0;
+  return `
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-val">$${fmtCOP(revenue)}</div><div class="stat-lbl">Ingresos totales</div></div>
+    <div class="stat"><div class="stat-val">${confirmed.length}</div><div class="stat-lbl">Órdenes confirmadas</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--orange)">${pending.length}</div><div class="stat-lbl">Pendientes de pago</div></div>
+    <div class="stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Boletas vendidas</div></div>
+    <div class="stat"><div class="stat-val">${sold}</div><div class="stat-lbl">Boletas vendidas</div></div>
+    <div class="stat"><div class="stat-val">${Math.max(0,total-sold-pending.reduce((s,o)=>s+o.qty,0))}</div><div class="stat-lbl">Disponibles</div></div>
+  </div>
+  <div class="adm-card">
+    <div class="adm-card-title">🏅 Top Compradores</div>
+    ${top.length===0?'<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px">No hay compras confirmadas aún.</div>':
+    top.map(([email,d],i)=>`<div class="top-buyer"><div class="tb-rank">${['🥇','🥈','🥉','4°','5°'][i]}</div><div><div class="tb-name">${d.name}</div><div style="font-size:11px;color:var(--muted)">${email}</div></div><div class="tb-qty">${d.qty} boleta${d.qty!==1?'s':''} · $${fmtCOP(d.total)}</div></div>`).join('')}
+  </div>
+  <div class="adm-card">
+    <div class="adm-card-title">📥 Exportar participantes <button onclick="exportCSV()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer">Descargar CSV</button></div>
+    <div style="font-size:13px;color:var(--text2)">Exporta la lista completa de participantes confirmados con sus números asignados.</div>
+  </div>`;
+}
+
+function renderOrders(all){
+  const sorted=[...all].sort((a,b)=>b.ts-a.ts);
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">🎟️ Todas las Órdenes</div>
+    ${sorted.length===0?'<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">No hay órdenes aún.</div>':
+    sorted.map(o=>{
+      const isPend=o.status==='pending'&&o.reserveUntil>Date.now();
+      const statusClass={pending:'s-pending',confirmed:'s-confirmed',rejected:'s-rejected',expired:'s-expired'}[o.status]||'s-expired';
+      const statusLabel={pending:isPend?'⏳ RESERVADO':'⌛ EXPIRADO',confirmed:'✅ CONFIRMADO',rejected:'❌ RECHAZADO',expired:'⌛ EXPIRADO'}[o.status]||o.status;
+      return `<div class="order-row">
+        <div class="ord-id">${o.id}</div>
+        <div>
+          <div class="ord-name">${o.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${o.email} · ${o.phone}${o.ig?' · '+o.ig:''}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">💳 ${o.pay} · ${new Date(o.ts).toLocaleString('es-CO')}</div>
+          ${o.numbers.length>0?`<div style="font-size:11px;color:var(--gold);margin-top:3px">🎟️ ${o.numbers.map(n=>padNum(n)).join(', ')}</div>`:''}
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="ord-total">$${fmtCOP(o.total)}</div>
+          <div class="ord-qty">${o.qty} boleta${o.qty!==1?'s':''}</div>
+          <span class="ord-status ${statusClass}">${statusLabel}</span>
+          ${(o.status==='pending'&&isPend)?`<div class="ord-actions"><button class="btn-confirm" onclick="confirmOrder('${o.id}')">✓ Confirmar</button><button class="btn-reject" onclick="rejectOrder('${o.id}')">✗ Rechazar</button></div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderConfig(){
+  const c=state.cfg;
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">🎰 Configuración del Sorteo</div>
+    <div class="af-row">
+      <div class="af"><label>Nombre del negocio</label><input id="aN" value="${c.name}"></div>
+      <div class="af"><label>Estado</label><select id="aClosed"><option value="false" ${!c.closed?'selected':''}>🟢 Abierto</option><option value="true" ${c.closed?'selected':''}>🔒 Cerrado</option></select></div>
+    </div>
+    <div class="af"><label>Nombre del premio</label><input id="aPN" value="${c.prizeName}"></div>
+    <div class="af"><label>Descripción</label><textarea id="aPD" rows="2">${c.prizeDesc}</textarea></div>
+    <div class="af"><label>URL de imagen del premio</label><input id="aPImg" value="${c.prizeImg||''}" placeholder="https://..."></div>
+    <div class="af-row">
+      <div class="af"><label>Número inicial</label><input type="number" id="aNF" value="${c.numFrom}"></div>
+      <div class="af"><label>Número final</label><input type="number" id="aNT" value="${c.numTo}"></div>
+    </div>
+    <div class="af-row">
+      <div class="af"><label>Precio por boleta ($)</label><input type="number" id="aPR" value="${c.price}"></div>
+      <div class="af"><label>Compra mínima</label><input type="number" id="aMIN" value="${c.minBuy||1}"></div>
+    </div>
+    <div class="af-row">
+      <div class="af"><label>Minutos de reserva</label><input type="number" id="aRM" value="${c.reserveMinutes||15}"></div>
+      <div class="af"><label>Paquete popular (resaltar)</label><input type="number" id="aHP" value="${c.hotPack||5}"></div>
+    </div>
+    <div class="af"><label>Paquetes disponibles (separados por coma)</label><input id="aPKS" value="${(c.packs||[]).join(',')}"></div>
+    <div class="af-row">
+      <div class="af"><label>Lotería</label><input id="aL" value="${c.lottery}"></div>
+      <div class="af"><label>Fecha del sorteo (texto)</label><input id="aLD" value="${c.lotteryDate}"></div>
+    </div>
+    <div class="af"><label>Fecha/hora para countdown (YYYY-MM-DDTHH:MM)</label><input type="datetime-local" id="aDD" value="${c.drawDate||''}"></div>
+    <div class="af"><label>Números premiados (formato: 12345:Premio, 67890:Premio)</label><input id="aSP" value="${(c.specials||[]).map(s=>s.num+':'+s.label).join(', ')}"></div>
+    <div class="af-row">
+      <div class="af"><label>Instagram URL</label><input id="aIG" value="${c.ig||''}"></div>
+      <div class="af"><label>Facebook URL</label><input id="aFB" value="${c.fb||''}"></div>
+    </div>
+    <div class="af-row">
+      <div class="af"><label>WhatsApp notificaciones (sin +)</label><input id="aWA" value="${c.wa||''}"></div>
+      <div class="af"><label>WhatsApp soporte (sin +)</label><input id="aSWA" value="${c.supportWa||''}"></div>
+    </div>
+    <div class="af"><label>Mensaje sorteo cerrado</label><input id="aCM" value="${c.closedMsg||''}"></div>
+    <div class="af"><label>Términos y condiciones</label><textarea id="aTC" rows="3">${c.tc||''}</textarea></div>
+    <button class="save-btn" onclick="saveConfig()">💾 Guardar configuración</button>
+    <button class="danger-btn" onclick="if(confirm('¿Reiniciar TODAS las órdenes? Esto no se puede deshacer.'))resetOrders()">⚠️ Reiniciar órdenes (nuevo sorteo)</button>
+    <div style="margin-top:16px">
+      <div class="adm-card-title" style="font-size:13px;margin-bottom:12px">🏆 Agregar ganador anterior</div>
+      <div class="af-row">
+        <div class="af"><label>Nombre ganador</label><input id="wName" placeholder="Nombre"></div>
+        <div class="af"><label>Número ganador</label><input id="wNum" placeholder="12345"></div>
+      </div>
+      <div class="af-row">
+        <div class="af"><label>Premio</label><input id="wPrize" placeholder="iPhone 15 Pro"></div>
+        <div class="af"><label>Fecha</label><input id="wDate" placeholder="15 de Marzo 2025"></div>
+      </div>
+      <button class="save-btn" style="margin-top:0" onclick="addWinner()">➕ Agregar ganador</button>
+    </div>
+  </div>`;
+}
+
+function renderPaymentsAdmin(){
+  const pms=state.cfg.payments||[];
+  const icons=['💚','🏦','💜','🏛️','💵','📲'];
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">💳 Métodos de Pago</div>
+    <div id="pmList">
+      ${pms.map((pm,i)=>`
+      <div class="pm-row" id="pm_${i}">
+        <span style="font-size:20px">${pm.icon||icons[i%icons.length]}</span>
+        <input value="${pm.name}" onchange="updatePM(${i},'name',this.value)" placeholder="Nombre (ej: Nequi)">
+        <input value="${pm.detail}" onchange="updatePM(${i},'detail',this.value)" placeholder="Dato (ej: 3001234567)">
+        <input value="${pm.icon||''}" onchange="updatePM(${i},'icon',this.value)" placeholder="Emoji" style="max-width:60px">
+        <button class="pm-del" onclick="deletePM(${i})">✗</button>
+      </div>`).join('')}
+    </div>
+    <button onclick="addPM()" style="margin-top:10px;padding:8px 18px;border-radius:10px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer">+ Agregar método</button>
+    <button class="save-btn" style="margin-top:14px" onclick="savePMs()">💾 Guardar métodos de pago</button>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">⚠️ Los datos de pago son visibles para los compradores. Asegúrate de que sean correctos.</p>
+  </div>`;
+}
+
+function renderUsers(){
+  const users=state.cfg.users||[];
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">👥 Equipo de Administración</div>
+    ${users.map((u,i)=>`
+    <div class="user-row">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${u.name}</div>
+        <div style="font-size:11px;color:var(--muted)">@${u.user}</div>
+      </div>
+      <span class="user-role-badge ${u.role==='owner'?'role-owner':'role-staff'}">${u.role==='owner'?'DUEÑO':'STAFF'}</span>
+      ${u.role!=='owner'?`<button class="pm-del" onclick="deleteUser(${i})">✗</button>`:''}
+    </div>`).join('')}
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">➕ Agregar usuario</div>
+      <div class="af-row">
+        <div class="af"><label>Nombre</label><input id="uName" placeholder="Nombre completo"></div>
+        <div class="af"><label>Usuario</label><input id="uUser" placeholder="usuario123"></div>
+      </div>
+      <div class="af-row">
+        <div class="af"><label>Contraseña</label><input type="password" id="uPass" placeholder="contraseña segura"></div>
+        <div class="af"><label>Rol</label><select id="uRole"><option value="staff">Staff (confirmar pagos)</option><option value="owner">Dueño (acceso total)</option></select></div>
+      </div>
+      <button class="save-btn" onclick="addUser()">➕ Agregar usuario</button>
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">🔑 Cambiar contraseña maestra</div>
+      <div class="af-row">
+        <div class="af"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Nueva contraseña"></div>
+        <div class="af"><label>Confirmar</label><input type="password" id="newPass2" placeholder="Repetir contraseña"></div>
+      </div>
+      <button class="save-btn" onclick="changePass()">🔑 Cambiar contraseña</button>
+    </div>
+  </div>`;
+}
+
+function renderDraw(){
+  const confirmed=getAllOrders().filter(o=>o.status==='confirmed');
+  const allNums=[];
+  confirmed.forEach(o=>o.numbers.forEach(n=>allNums.push({n,order:o})));
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">🎰 Realizar Sorteo</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Ingresa el número ganador de la lotería oficial y el sistema identificará automáticamente al ganador.</p>
+    <div class="af"><label>Número ganador de la lotería</label><input type="text" id="drawNum" placeholder="${padNum(state.cfg.numFrom)}" style="font-family:'Cinzel',serif;font-size:20px;text-align:center;letter-spacing:4px"></div>
+    <button class="save-btn" onclick="doDrawSorteo()">🎲 Buscar Ganador</button>
+    <div id="drawResult" style="margin-top:20px"></div>
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:11px;color:var(--muted)">Total de boletas confirmadas: <strong style="color:var(--gold)">${allNums.length}</strong> | Participantes únicos: <strong style="color:var(--gold)">${new Set(confirmed.map(o=>o.email)).size}</strong></div>
+    </div>
+  </div>`;
+}
+
+function renderLog(){
+  const log=(state.cfg.auditLog||[]).slice().reverse().slice(0,50);
+  return `
+  <div class="adm-card">
+    <div class="adm-card-title">📋 Log de Actividad</div>
+    ${log.length===0?'<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">No hay actividad registrada.</div>':
+    log.map(l=>`<div class="log-item">${l}</div>`).join('')}
+  </div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ADMIN ACTIONS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function confirmOrder(id){
+  const order=state.orders[id];
+  if(!order||order.status==='confirmed') return;
+  // Assign random numbers
+  const avail=getAvailNums();
+  if(avail.length<order.qty){ alert(`Solo quedan ${avail.length} números disponibles.`); return; }
+  const shuffled=avail.sort(()=>Math.random()-.5);
+  const assigned=shuffled.slice(0,order.qty).sort((a,b)=>a-b);
+  order.numbers=assigned;
+  order.status='confirmed';
+  order.confirmedAt=Date.now();
+  addAuditLog(`✅ Pago confirmado: ${order.name} (${order.id}) → números: ${assigned.map(n=>padNum(n)).join(', ')}`);
+  saveState();
+  renderAdminPortal();
+  renderPublic();
+  // Show notification
+  window._confirmedOrder=order;
+  // Notify WA
+  if(state.cfg.wa){
+    const nums=assigned.map(n=>padNum(n)).join(', ');
+    const msg=`✅ *PAGO CONFIRMADO*\n\n👤 ${order.name}\n📧 ${order.email}\n📱 ${order.phone}\n\n🎟️ Tus números oficiales: *${nums}*\n💰 Total: $${fmtCOP(order.total)}\n🎰 Sorteo: ${state.cfg.lottery} · ${state.cfg.lotteryDate}\n\n¡Mucha suerte! 🍀`;
+    if(confirm(`¿Notificar al ganador por WhatsApp?\n\n${order.name} — ${nums}`)){
+      window.open(`https://wa.me/${order.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+    }
+  }
+  // Show numbers modal
+  const revealEl=document.getElementById('numReveal');
+  revealEl.innerHTML='';
+  assigned.forEach((n,i)=>{
+    const c=document.createElement('div');
+    c.className='num-chip';
+    c.style.animationDelay=`${i*.07}s`;
+    c.textContent=padNum(n);
+    revealEl.appendChild(c);
+  });
+  document.getElementById('modalLottery').textContent=state.cfg.lottery;
+  document.getElementById('modalDate').textContent=state.cfg.lotteryDate||'fecha por confirmar';
+  openModal('numbersModal');
+}
+
+function rejectOrder(id){
+  if(!confirm('¿Rechazar esta orden?')) return;
+  state.orders[id].status='rejected';
+  addAuditLog(`❌ Orden rechazada: ${id}`);
+  saveState();
+  renderAdminPortal();
+  renderPublic();
+}
+
+function saveConfig(){
+  const g=id=>document.getElementById(id);
+  const c=state.cfg;
+  c.name=g('aN').value||c.name;
+  c.prizeName=g('aPN').value||c.prizeName;
+  c.prizeDesc=g('aPD').value||c.prizeDesc;
+  c.prizeImg=g('aPImg').value;
+  c.numFrom=parseInt(g('aNF').value)||0;
+  c.numTo=parseInt(g('aNT').value)||99999;
+  c.price=parseInt(g('aPR').value)||c.price;
+  c.minBuy=parseInt(g('aMIN').value)||1;
+  c.reserveMinutes=parseInt(g('aRM').value)||15;
+  c.hotPack=parseInt(g('aHP').value)||5;
+  c.packs=g('aPKS').value.split(',').map(s=>parseInt(s.trim())).filter(Boolean);
+  c.lottery=g('aL').value||c.lottery;
+  c.lotteryDate=g('aLD').value;
+  c.drawDate=g('aDD').value;
+  c.ig=g('aIG').value;
+  c.fb=g('aFB').value;
+  c.wa=g('aWA').value;
+  c.supportWa=g('aSWA').value;
+  c.closed=g('aClosed').value==='true';
+  c.closedMsg=g('aCM').value||c.closedMsg;
+  c.tc=g('aTC').value||c.tc;
+  const spRaw=g('aSP').value;
+  c.specials=spRaw?spRaw.split(',').map(s=>{const[n,...r]=s.trim().split(':');return{num:parseInt(n.trim()),label:r.join(':').trim()||'Premio'};}).filter(s=>!isNaN(s.num)):[];
+  addAuditLog(`⚙️ Configuración actualizada por ${currentAdminUser.name}`);
+  saveState();
+  renderAdminPortal();
+  renderPublic();
+  alert('✅ Configuración guardada');
+}
+
+function resetOrders(){
+  state.orders={};
+  state.cfg.soldBase=0;
+  addAuditLog(`🔄 Órdenes reiniciadas por ${currentAdminUser.name}`);
+  saveState();
+  renderAdminPortal();
+  renderPublic();
+  alert('Órdenes reiniciadas. Listo para nuevo sorteo.');
+}
+
+function addWinner(){
+  const name=document.getElementById('wName').value.trim();
+  const num=document.getElementById('wNum').value.trim();
+  const prize=document.getElementById('wPrize').value.trim();
+  const date=document.getElementById('wDate').value.trim();
+  if(!name||!num||!prize||!date) return alert('Completa todos los campos del ganador.');
+  if(!state.cfg.winners) state.cfg.winners=[];
+  state.cfg.winners.push({name,winNum:parseInt(num)||num,prize,date});
+  addAuditLog(`🏆 Ganador agregado: ${name}`);
+  saveState();
+  renderAdminPortal();
+  renderPublic();
+}
+
+function updatePM(i,field,val){ state.cfg.payments[i][field]=val; }
+function deletePM(i){ state.cfg.payments.splice(i,1); saveState(); renderAdminPortal(); }
+function addPM(){ state.cfg.payments.push({name:'Nuevo método',icon:'💳',detail:'Dato de pago'}); saveState(); renderAdminPortal(); }
+function savePMs(){ addAuditLog('💳 Métodos de pago actualizados'); saveState(); renderAdminPortal(); renderPublic(); alert('✅ Métodos de pago guardados'); }
+
+function deleteUser(i){
+  if(!confirm('¿Eliminar este usuario?')) return;
+  state.cfg.users.splice(i,1);
+  saveState(); renderAdminPortal();
+}
+function addUser(){
+  const name=document.getElementById('uName').value.trim();
+  const user=document.getElementById('uUser').value.trim();
+  const pass=document.getElementById('uPass').value;
+  const role=document.getElementById('uRole').value;
+  if(!name||!user||!pass) return alert('Completa todos los campos.');
+  if(!state.cfg.users) state.cfg.users=[];
+  state.cfg.users.push({name,user,pass,role});
+  addAuditLog(`👤 Usuario agregado: ${name} (${role})`);
+  saveState(); renderAdminPortal();
+}
+function changePass(){
+  const p1=document.getElementById('newPass').value;
+  const p2=document.getElementById('newPass2').value;
+  if(!p1||p1!==p2) return alert('Las contraseñas no coinciden.');
+  if(p1.length<6) return alert('La contraseña debe tener al menos 6 caracteres.');
+  state.cfg.adminPass=p1;
+  const owner=state.cfg.users&&state.cfg.users.find(u=>u.role==='owner');
+  if(owner) owner.pass=p1;
+  addAuditLog('🔑 Contraseña maestra actualizada');
+  saveState(); alert('✅ Contraseña actualizada');
+}
+
+function doDrawSorteo(){
+  const raw=document.getElementById('drawNum').value.trim();
+  const num=parseInt(raw);
+  const res=document.getElementById('drawResult');
+  if(isNaN(num)||num<state.cfg.numFrom||num>state.cfg.numTo){
+    res.innerHTML=`<div style="color:var(--red);font-size:13px">Número inválido. Debe estar entre ${padNum(state.cfg.numFrom)} y ${padNum(state.cfg.numTo)}</div>`;
+    return;
+  }
+  const confirmed=getAllOrders().filter(o=>o.status==='confirmed');
+  let winner=null;
+  confirmed.forEach(o=>{ if(o.numbers.includes(num)) winner=o; });
+  if(!winner){
+    res.innerHTML=`<div style="background:rgba(255,59,92,0.1);border:1px solid rgba(255,59,92,0.2);border-radius:var(--r);padding:16px;font-size:13px"><strong style="color:var(--red)">Número ${padNum(num)} no está vendido.</strong><br><span style="color:var(--text2)">Puedes elegir el número más cercano o revisar las reglas del sorteo.</span></div>`;
+    return;
+  }
+  res.innerHTML=`
+  <div style="background:rgba(201,168,76,0.08);border:2px solid var(--gold-border2);border-radius:var(--r2);padding:24px;text-align:center">
+    <div style="font-size:48px;margin-bottom:12px">🎉</div>
+    <div style="font-family:'Cinzel',serif;font-size:28px;font-weight:900;color:var(--gold2);margin-bottom:6px">${padNum(num)}</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:4px">${winner.name}</div>
+    <div style="font-size:13px;color:var(--text2)">${winner.email} · ${winner.phone}</div>
+    ${winner.ig?`<div style="font-size:13px;color:var(--blue)">${winner.ig}</div>`:''}
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button onclick="notifyWinner('${winner.id}')" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#128C7E,#25D366);color:#fff;border:none;font-weight:700;cursor:pointer;font-size:13px">📲 Notificar por WhatsApp</button>
+      <button onclick="saveWinnerFromDraw('${winner.id}',${num})" style="padding:10px 20px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-weight:700;cursor:pointer;font-size:13px">🏆 Guardar en ganadores</button>
+    </div>
+  </div>`;
+}
+
+function notifyWinner(orderId){
+  const order=state.orders[orderId];
+  if(!order) return;
+  const msg=`🎉 *¡FELICITACIONES ${order.name.toUpperCase()}!* 🎉\n\nEres el ganador del sorteo de *${state.cfg.prizeName}*.\n\n🎟️ Tu número ganador fue parte de tus boletas.\n\nNos pondremos en contacto contigo para coordinar la entrega del premio. ¡Gracias por participar! 🏆`;
+  window.open(`https://wa.me/${order.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function saveWinnerFromDraw(orderId,num){
+  const order=state.orders[orderId];
+  if(!order) return;
+  if(!state.cfg.winners) state.cfg.winners=[];
+  state.cfg.winners.push({
+    name:order.name, winNum:num,
+    prize:state.cfg.prizeName,
+    date: new Date().toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'})
+  });
+  addAuditLog(`🏆 Ganador del sorteo: ${order.name} con número ${padNum(num)}`);
+  saveState(); renderPublic(); alert('✅ Ganador guardado en la sección pública.');
+}
+
+function exportCSV(){
+  const confirmed=getAllOrders().filter(o=>o.status==='confirmed');
+  if(confirmed.length===0) return alert('No hay órdenes confirmadas para exportar.');
+  const rows=[['ID','Nombre','Email','Teléfono','Instagram','Boletas','Total','Números','Fecha']];
+  confirmed.forEach(o=>{
+    rows.push([o.id,o.name,o.email,o.phone,o.ig||'',o.qty,o.total,o.numbers.map(n=>padNum(n)).join(' | '),new Date(o.ts).toLocaleString('es-CO')]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`participantes_${state.cfg.prizeName.replace(/\s+/g,'_')}_${Date.now()}.csv`;
+  a.click();
+  addAuditLog(`📥 CSV exportado por ${currentAdminUser.name}`);
+  saveState();
+}
+
+function addAuditLog(msg){
+  if(!state.cfg.auditLog) state.cfg.auditLog=[];
+  state.cfg.auditLog.unshift(`[${new Date().toLocaleString('es-CO')}] ${msg}`);
+  if(state.cfg.auditLog.length>100) state.cfg.auditLog=state.cfg.auditLog.slice(0,100);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CSS SHAKE ANIMATION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const style=document.createElement('style');
+style.textContent=`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}`;
+document.head.appendChild(style);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EXPIRE OLD PENDING ORDERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function cleanExpired(){
+  const now=Date.now();
+  let changed=false;
+  Object.values(state.orders).forEach(o=>{
+    if(o.status==='pending' && o.reserveUntil <= now){
+      o.status='expired'; changed=true;
+    }
+  });
+  if(changed){ saveState(); renderPublic(); }
+}
+setInterval(cleanExpired, 30000);
+cleanExpired();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INIT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+renderPublic();
+</script>
+</body>
+</html>
